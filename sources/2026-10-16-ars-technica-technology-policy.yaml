@@ -1,0 +1,5 @@
+# Added from WOPR, 16 October 2026
+beat: "Technology"
+sources:
+  - name: "Ars Technica"
+    url: "https://feeds.arstechnica.com/arstechnica/tech-policy"
