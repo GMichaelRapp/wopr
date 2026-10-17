@@ -1,0 +1,5 @@
+# Added from WOPR, 16 October 2026
+beat: "Defense & Military"
+sources:
+  - name: "War on the Rocks"
+    url: "https://warontherocks.com/"
