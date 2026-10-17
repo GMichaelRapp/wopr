@@ -1,0 +1,284 @@
+# ─────────────────────────────────────────────────────────────────────────
+#  NEWSFEED SOURCES
+#
+#  Each beat below becomes a filter chip on the page. Inside a beat, an
+#  entry can take one of three forms:
+#
+#    - {name: Krebs on Security, url: https://krebsonsecurity.com/feed/, desc: Security Blog Post}
+#        A site's own RSS/Atom feed. Fastest and cleanest links.
+#
+#    - {name: CSIS, site: csis.org, desc: Expert Commentary}
+#        A site with no usable feed. Pulled through a Google News search
+#        of that domain, so coverage depends on what Google indexes.
+#
+#    - '"Taiwan Strait"'
+#        A plain string is a Google News search: anything you would type
+#        into news.google.com (quotes, OR, -exclusions all work). Each
+#        story shows its real publisher as the source.
+#
+#  Optional on any entry:
+#    include: [drone, missile]   keep only stories mentioning one of these
+#    enabled: false              switch a source off without deleting it
+#
+#  OSINT citation defaults (used by the Cite button for every story from
+#  that source; each story's own author, title, date and link are added):
+#    location: The New York Times   the publication, slot 3 (default: name);
+#                                   "feed" uses the feed's own title
+#    desc: Expert Commentary        kind of source for the [bracket]
+#                                   (default: News Article)
+#    access: [metered paywall]      access notes for the [bracket]
+#    publisher: US Government       slot 5, when it differs from the location
+#    details: r/netsec              details for the [bracket]
+#    author: US Government Accountability Office
+#                                   used only when the feed names no author
+#  Use terms from the OSINT Cites library so its checks recognize them.
+#
+#  Adding more:
+#    Substack     https://NAME.substack.com/feed
+#    YouTube      https://www.youtube.com/feeds/videos.xml?channel_id=UC...
+#    Reddit       https://www.reddit.com/r/SUBREDDIT/.rss
+#    WordPress    most sites: https://SITE/feed/
+#
+#  Sources added with the page's "+ Source" button are saved as small
+#  files in the sources/ folder and merged in with this list.
+#
+#  After each run, docs/status.html lists any source that failed. These
+#  addresses were compiled from each site's usual feed location and have
+#  not all been tested, so expect a handful to need fixing on the first run.
+# ─────────────────────────────────────────────────────────────────────────
+
+settings:
+  title: WOPR
+  timezone: America/Denver
+  page_hours: 72          # how far back the page reaches
+  max_page_items: 1500    # cap on stories shown
+  archive_days: 30        # how long stories stay in data/items.json
+  gnews_days: 3           # look-back window for Google News searches
+  timeout: 20             # seconds before a slow source is skipped
+  workers: 16             # parallel fetches for direct feeds
+  gnews_workers: 4        # parallel fetches for Google News (kept low)
+  exclude: []             # words that drop a headline, e.g. ["deal of the day", "horoscope"]
+
+beats:
+
+  World News:
+    - {name: Reuters, site: reuters.com, desc: Wire Service Report}
+    - {name: AP, site: apnews.com, location: AP News, desc: Wire Service Report}
+    - {name: BBC World, url: https://feeds.bbci.co.uk/news/world/rss.xml, location: BBC News}
+    - {name: NPR World, url: https://feeds.npr.org/1004/rss.xml, location: NPR}
+    - {name: The Guardian, url: https://www.theguardian.com/world/rss}
+    - {name: New York Times, url: https://rss.nytimes.com/services/xml/rss/nyt/World.xml, location: The New York Times, access: [metered paywall]}
+    - {name: Washington Post, url: https://feeds.washingtonpost.com/rss/world, location: The Washington Post, access: [metered paywall]}
+    - {name: Al Jazeera, url: https://www.aljazeera.com/xml/rss/all.xml}
+    - {name: DW, url: https://rss.dw.com/rdf/rss-en-world}
+    - {name: France 24, url: https://www.france24.com/en/rss}
+    - {name: CBC World, url: https://www.cbc.ca/webfeed/rss/rss-world, location: CBC News}
+    - {name: The Economist, url: https://www.economist.com/international/rss.xml, desc: Magazine Article, access: [paywalled]}
+    - {name: Axios, url: https://api.axios.com/feed/}
+    - {name: Financial Times, site: ft.com, access: [paywalled]}
+    - {name: Nikkei Asia, site: asia.nikkei.com, access: [paywalled]}
+
+  Geopolitics & Analysis:
+    - {name: Foreign Affairs, url: https://www.foreignaffairs.com/rss.xml, desc: Magazine Article, access: [metered paywall]}
+    - {name: Foreign Policy, url: https://foreignpolicy.com/feed/, desc: Magazine Article, access: [metered paywall]}
+    - {name: The National Interest, url: https://nationalinterest.org/feed, desc: Magazine Article}
+    - {name: Responsible Statecraft, url: https://responsiblestatecraft.org/feed/, desc: Magazine Article}
+    - {name: Just Security, url: https://www.justsecurity.org/feed/, desc: Policy Analysis}
+    - {name: Lawfare, site: lawfaremedia.org, desc: Policy Analysis}
+    - {name: Bellingcat, url: https://www.bellingcat.com/feed/, desc: Open-Source Investigation}
+    - {name: Brookings, url: https://www.brookings.edu/feed/, desc: Expert Commentary}
+    - {name: Atlantic Council, url: https://www.atlanticcouncil.org/feed/, desc: Expert Commentary}
+    - {name: AEI, url: https://www.aei.org/feed/, desc: Expert Commentary}
+    - {name: CSIS, site: csis.org, desc: Expert Commentary}
+    - {name: RAND, site: rand.org, desc: Expert Commentary}
+    - {name: Carnegie Endowment, site: carnegieendowment.org, desc: Expert Commentary}
+    - {name: CFR, site: cfr.org, desc: Expert Commentary}
+    - {name: Heritage Foundation, site: heritage.org, desc: Expert Commentary}
+    - {name: Hudson Institute, site: hudson.org, desc: Expert Commentary}
+    - {name: CNAS, site: cnas.org, desc: Expert Commentary}
+    - {name: Stimson Center, site: stimson.org, desc: Expert Commentary}
+    - {name: Cato Institute, site: cato.org, desc: Expert Commentary}
+    - {name: FPRI, site: fpri.org, desc: Expert Commentary}
+    - {name: Chatham House, site: chathamhouse.org, desc: Expert Commentary}
+    - {name: IISS, site: iiss.org, desc: Expert Commentary}
+    - {name: RUSI, site: rusi.org, desc: Expert Commentary}
+    - {name: ECFR, site: ecfr.eu, desc: Expert Commentary}
+    - {name: Crisis Group, site: crisisgroup.org, desc: Expert Commentary}
+
+  Defense & Military:
+    - {name: War on the Rocks, url: https://warontherocks.com/feed/, desc: Defense Analysis Article}
+    - {name: Defense News, url: "https://www.defensenews.com/arc/outboundfeeds/rss/?outputType=xml"}
+    - {name: Breaking Defense, url: https://breakingdefense.com/feed/}
+    - {name: The War Zone, url: https://www.twz.com/feed}
+    - {name: Defense One, url: https://www.defenseone.com/rss/all/}
+    - {name: Military Times, url: "https://www.militarytimes.com/arc/outboundfeeds/rss/?outputType=xml"}
+    - {name: Task & Purpose, url: https://taskandpurpose.com/feed/}
+    - {name: Politico Defense, url: https://rss.politico.com/defense.xml}
+    - {name: Modern War Institute, url: https://mwi.westpoint.edu/feed/, desc: Defense Analysis Article}
+    - {name: 19FortyFive, url: https://www.19fortyfive.com/feed/, desc: Defense Analysis Article}
+    - {name: Air & Space Forces Magazine, url: https://www.airandspaceforces.com/feed/}
+    - {name: Stars and Stripes, site: stripes.com}
+    - {name: Military.com, site: military.com}
+    - {name: Small Wars Journal, site: smallwarsjournal.com, desc: Defense Analysis Article}
+    - {name: Janes, site: janes.com, access: [paywalled]}
+    - {name: Army University Press, site: armyupress.army.mil}
+    - '"defense budget" OR "Pentagon budget"'
+    - '"large-scale combat operations"'
+    - 'NATO defense spending'
+    - '"arms sale" OR "foreign military sale"'
+    - '"military exercise" OR "war games"'
+    - 'military medicine battlefield casualty'
+
+  Naval & Maritime:
+    - {name: USNI News, url: https://news.usni.org/feed}
+    - {name: Naval News, url: https://www.navalnews.com/feed/}
+    - {name: CIMSEC, url: https://cimsec.org/feed/, desc: Defense Analysis Article}
+    - {name: gCaptain, url: https://gcaptain.com/feed/}
+    - {name: Maritime Executive, site: maritime-executive.com}
+    - '"PLA Navy" OR "Chinese navy"'
+    - 'Navy shipbuilding'
+    - '"undersea cable"'
+    - '"Red Sea" shipping'
+    - 'submarine AUKUS OR Virginia-class OR Columbia-class'
+
+  Ukraine & Russia:
+    - {name: Kyiv Independent, site: kyivindependent.com}
+    - {name: ISW, site: understandingwar.org, desc: Expert Commentary}
+    - {name: RFE/RL, site: rferl.org}
+    - {name: Meduza, url: https://meduza.io/rss/en/all}
+    - {name: The Moscow Times, url: https://www.themoscowtimes.com/rss/news}
+    - 'Ukraine drone strike'
+    - 'Ukraine Russia "front line"'
+    - 'Russia sanctions oil "shadow fleet"'
+    - '"Black Sea" Russia Ukraine'
+    - 'Russia NATO Baltic'
+
+  China & Indo-Pacific:
+    - {name: The Diplomat, url: https://thediplomat.com/feed/}
+    - {name: South China Morning Post, site: scmp.com, access: [metered paywall]}
+    - {name: Japan Times, url: https://www.japantimes.co.jp/feed/}
+    - {name: Yonhap, url: https://en.yna.co.kr/RSS/news.xml}
+    - {name: NK News, url: https://www.nknews.org/feed/, access: [paywalled]}
+    - {name: 38 North, url: https://www.38north.org/feed/, desc: Expert Commentary}
+    - {name: Taipei Times, url: https://www.taipeitimes.com/xml/index.rss}
+    - {name: Focus Taiwan, site: focustaiwan.tw}
+    - {name: ASPI Strategist, url: https://www.aspistrategist.org.au/feed/, desc: Expert Commentary}
+    - {name: Lowy Interpreter, site: lowyinstitute.org, desc: Expert Commentary}
+    - {name: Jamestown Foundation, url: https://jamestown.org/feed/, desc: Expert Commentary}
+    - {name: China Media Project, url: https://chinamediaproject.org/feed/, desc: News Analysis}
+    - {name: Asia Times, url: https://asiatimes.com/feed/}
+    - {name: Sinocism, url: https://sinocism.com/feed, location: feed, desc: Newsletter Article, access: [paywalled]}
+    - {name: ChinaTalk, url: https://www.chinatalk.media/feed, location: feed, desc: Newsletter Article}
+    - '"Taiwan Strait"'
+    - '"South China Sea"'
+    - '"People''s Liberation Army"'
+    - 'Philippines China "coast guard"'
+    - 'North Korea missile'
+    - 'Japan defense Self-Defense Forces'
+    - 'India China border'
+    - 'China export controls semiconductors'
+
+  Middle East & Africa:
+    - {name: Times of Israel, url: https://www.timesofisrael.com/feed/}
+    - {name: Middle East Eye, url: https://www.middleeasteye.net/rss}
+    - {name: Al-Monitor, site: al-monitor.com}
+    - {name: The Africa Report, site: theafricareport.com}
+    - {name: ACLED, site: acleddata.com, desc: Expert Commentary}
+    - 'Houthi'
+    - 'Iran nuclear OR IRGC'
+    - 'Gaza ceasefire OR Hamas'
+    - 'Syria OR Iraq militia'
+    - 'Sudan war RSF'
+    - 'Sahel coup OR junta'
+    - '"Africa Corps" OR Wagner Africa'
+
+  Americas & Organized Crime:
+    - {name: InSight Crime, url: https://insightcrime.org/feed/}
+    - 'cartel violence Mexico'
+    - 'Venezuela military OR Maduro'
+    - 'Haiti gangs'
+    - '"organized crime" state corruption'
+
+  Cyber:
+    - {name: Krebs on Security, url: https://krebsonsecurity.com/feed/, desc: Security Blog Post}
+    - {name: The Record, url: https://therecord.media/feed/}
+    - {name: CyberScoop, url: https://cyberscoop.com/feed/}
+    - {name: BleepingComputer, url: https://www.bleepingcomputer.com/feed/}
+    - {name: The Hacker News, url: https://feeds.feedburner.com/TheHackersNews}
+    - {name: Dark Reading, url: https://www.darkreading.com/rss.xml}
+    - {name: SecurityWeek, url: https://www.securityweek.com/feed/}
+    - {name: Wired Security, url: https://www.wired.com/feed/category/security/latest/rss, location: Wired, access: [metered paywall]}
+    - {name: Ars Technica Security, url: https://feeds.arstechnica.com/arstechnica/security, location: Ars Technica}
+    - {name: The Register Security, url: https://www.theregister.com/security/headlines.atom, location: The Register}
+    - {name: Schneier on Security, url: https://www.schneier.com/feed/atom/, desc: Security Blog Post}
+    - {name: Citizen Lab, url: https://citizenlab.ca/feed/, desc: Research Report}
+    - {name: Unit 42, url: https://unit42.paloaltonetworks.com/feed/, desc: Threat Intelligence Report}
+    - {name: Cisco Talos, url: https://blog.talosintelligence.com/rss/, desc: Threat Intelligence Report}
+    - {name: Microsoft Security, url: https://www.microsoft.com/en-us/security/blog/feed/, location: Microsoft Security Blog, desc: Corporate Blog Post}
+    - {name: Risky Business, site: risky.biz}
+    - 'ransomware attack'
+    - '"state-sponsored" hackers'
+    - '"Volt Typhoon" OR "Salt Typhoon" OR "APT28" OR "Lazarus Group"'
+    - '"zero-day" exploited'
+    - '"critical infrastructure" cyberattack'
+    - 'disinformation campaign influence operation'
+
+  Terrorism & Insurgency:
+    - {name: Long War Journal, url: https://www.longwarjournal.org/feed, desc: News Analysis}
+    - {name: CTC West Point, site: ctc.westpoint.edu, desc: Expert Commentary}
+    - {name: GNET, site: gnet-research.org, desc: Expert Commentary}
+    - {name: ICCT, site: icct.nl, desc: Expert Commentary}
+    - 'terrorist attack'
+    - '"Islamic State" OR ISIS'
+    - '"ISIS-K" OR "Islamic State Khorasan"'
+    - 'al-Shabaab'
+    - 'al-Qaeda OR JNIM'
+    - 'counterterrorism'
+
+  Defense Tech & Space:
+    - {name: DefenseScoop, url: https://defensescoop.com/feed/}
+    - {name: C4ISRNET, url: "https://www.c4isrnet.com/arc/outboundfeeds/rss/?outputType=xml"}
+    - {name: SpaceNews, url: https://spacenews.com/feed/}
+    - 'drone warfare'
+    - 'counter-drone OR "counter-UAS"'
+    - 'hypersonic missile'
+    - '"Golden Dome" missile defense'
+    - 'military "artificial intelligence"'
+    - '"directed energy" weapon'
+    - 'military innovation battlefield adaptation'
+
+  Science & Biosecurity:
+    - {name: Bulletin of the Atomic Scientists, url: https://thebulletin.org/feed/}
+    - {name: STAT News, url: https://www.statnews.com/feed/}
+    - {name: Arms Control Association, site: armscontrol.org, desc: Expert Commentary}
+    - '"biological weapons" OR bioweapon'
+    - 'biosecurity'
+    - '"nuclear arms control" OR "New START"'
+
+  Government & Official:
+    - {name: CISA Advisories, url: https://www.cisa.gov/cybersecurity-advisories/all.xml, location: CISA Government Website, desc: Security Advisory, publisher: US Government, author: Cybersecurity and Infrastructure Security Agency}
+    - {name: CISA News, url: https://www.cisa.gov/news.xml, location: CISA Government Website, desc: Government Press Release, publisher: US Government, author: Cybersecurity and Infrastructure Security Agency}
+    - {name: GAO Reports, url: https://www.gao.gov/rss/reports.xml, location: GAO Government Website, desc: GAO Report, publisher: US Government, author: US Government Accountability Office}
+    - {name: UK Ministry of Defence, url: https://www.gov.uk/government/organisations/ministry-of-defence.atom, location: GOV.UK, desc: Government Web Page, publisher: UK Government, author: UK Ministry of Defence}
+    - {name: Department of Defense, site: defense.gov, location: US Department of Defense Website, desc: Government Web Page, publisher: US Government}
+    - {name: State Department, site: state.gov, location: US Department of State Website, desc: Government Web Page, publisher: US Government}
+    - {name: NATO, site: nato.int, location: NATO Website, desc: Government Web Page}
+    - '"Congressional Research Service"'
+
+  Newsletters & Commentary:
+    - {name: Ryan McBeth, url: https://ryanmcbeth.substack.com/feed, location: feed, desc: Newsletter Article}
+    - {name: Phillips O'Brien, url: https://phillipspobrien.substack.com/feed, location: feed, desc: Newsletter Article}
+    - {name: Lawrence Freedman, url: https://samf.substack.com/feed, location: feed, desc: Newsletter Article}
+    - {name: Mick Ryan, url: https://mickryan.substack.com/feed, location: feed, desc: Newsletter Article}
+    - {name: Timothy Snyder, url: https://snyder.substack.com/feed, location: feed, desc: Newsletter Article}
+    - {name: Adam Tooze, url: https://adamtooze.substack.com/feed, location: feed, desc: Newsletter Article}
+    - {name: Daniel Drezner, url: https://danieldrezner.substack.com/feed, location: feed, desc: Newsletter Article}
+    - {name: Noahpinion, url: https://www.noahpinion.blog/feed, location: feed, desc: Newsletter Article}
+    - {name: ACOUP (Bret Devereaux), url: https://acoup.blog/feed/, location: A Collection of Unmitigated Pedantry, desc: Blog Post}
+
+  Community:
+    # Reddit often blocks GitHub's servers; if these fail on the status page,
+    # set enabled: false.
+    - {name: r/CredibleDefense, url: https://www.reddit.com/r/CredibleDefense/.rss, location: Reddit, desc: Forum Post, details: r/CredibleDefense}
+    - {name: r/geopolitics, url: https://www.reddit.com/r/geopolitics/.rss, location: Reddit, desc: Forum Post, details: r/geopolitics}
+    - {name: r/netsec, url: https://www.reddit.com/r/netsec/.rss, location: Reddit, desc: Forum Post, details: r/netsec}
