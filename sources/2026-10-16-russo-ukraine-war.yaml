@@ -1,0 +1,5 @@
+# Added from WOPR, 16 October 2026
+beat: "World News"
+sources:
+  - name: "Russo-Ukraine War"
+    query: "\"Ukraine\" AND \"War\""
